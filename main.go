@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	verifier = emailverifier.NewVerifier().EnableSMTPCheck()
+	verifier = emailverifier.NewVerifier()
 )
 
 func main() {
@@ -19,6 +19,11 @@ func main() {
 	input := flag.String("i", "input.txt", "specify file path to source of emails")
 	workers := flag.Int("w", 2, "specify max workers count")
 	connections := flag.Int("c", 2, "specify max connections count")
+	smtp := flag.Bool("smtp", false, "specify if smtp check required")
+
+	if *smtp {
+		verifier.EnableSMTPCheck()
+	}
 
 	// logger
 	f, err := Logger()
@@ -65,5 +70,7 @@ func main() {
 	}()
 
 	// run verification
-	NewPool(Verify, w, *workers, *connections).Start(emails)
+	NewPool(func(s string) error {
+		return Verify(s, *smtp)
+	}, w, *workers, *connections).Start(emails)
 }
