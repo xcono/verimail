@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"errors"
+	"github.com/samber/lo"
 	"log"
 	"os"
 	"strings"
@@ -36,6 +37,8 @@ func ReadInput(path string) (emails []string, err error) {
 	if len(emails) == 0 {
 		err = errors.New("Input file is empty")
 	}
+
+	emails = lo.Uniq[string](emails)
 
 	return
 }
